@@ -6,12 +6,14 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import util.TestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+/**
+ *  Main class for home page actions (search with brand name and price)
+ */
 public class HomePage {
 
     private final WebDriver driver;
@@ -40,6 +42,11 @@ public class HomePage {
     @FindBy(xpath = "//i[contains(text(),'chevron_right')]")
     private WebElement right_click_finding_item_page_change;
 
+    /**
+     * Inits webDriver and also PageFactory elements {@link PageFactory#initElements(WebDriver, Object)}
+     *
+     * @param driver the webDriver
+     */
     public HomePage(WebDriver driver) {
         this.driver = driver;
         PageFactory.initElements(this.driver, this);
@@ -59,26 +66,35 @@ public class HomePage {
         search.click();
     }
 
+    /**
+     * Taking finding items price
+     *
+     * @return  list of price {@link List<Integer>}
+     */
     public List<Integer> takePriceCount() {
         List<WebElement> elements = price_of_finding_items;
         List<String> texts = new ArrayList<>();
         for (WebElement element : elements) {
             texts.add(element.getText());
         }
-        return checkList(texts);
+        return TestUtils.checkList(texts);
     }
 
+    /**
+     * Count of total finding items
+     *
+     * @return total count of finding items
+     */
     public int takeCountOfTotalFindingItems() {
         String text = count_of_finding_items.getText();
-        Pattern compile = Pattern.compile("([0-9]+)");
-        Matcher matcher = compile.matcher(text);
-        int totalCount = 0;
-        if (matcher.find()) {
-            totalCount = Integer.parseInt(matcher.group());
-        }
-        return totalCount;
+       return TestUtils.convertStringToInt(text);
     }
 
+    /**
+     * Count of actual finding items
+     *
+     * @return actual count
+     */
     public int takeCountOfActualFindingItems() {
         int actualCount = 0;
         final int ITEMS_PER_PAGE = 50;
@@ -88,30 +104,6 @@ public class HomePage {
             actualCount += price_of_finding_items_div.size();
         }
         return actualCount;
-    }
-
-
-    private String convertToDollar(String el) {
-        String s = removeSpaces(el);
-        return String.valueOf(Integer.parseInt(s) / 480);
-    }
-
-    private String removeSpaces(String str) {
-        return str.substring(1).replaceAll(" ", "");
-    }
-
-    private List<Integer> checkList(List<String> list) {
-        List<Integer> prices = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            String str = list.get(i);
-            if (str.charAt(0) == '֏') {
-                list.set(i, convertToDollar(str));
-            } else {
-                list.set(i, removeSpaces(str));
-            }
-            prices.add(Integer.parseInt(list.get(i)));
-        }
-        return prices;
     }
 
     public WebDriver getDriver() {
