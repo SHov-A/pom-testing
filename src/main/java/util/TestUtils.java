@@ -115,7 +115,4 @@ public class TestUtils {
         driver.quit();
     }
 
-    public static void main(String[] args) {
-        System.getProperties();
-    }
 }
